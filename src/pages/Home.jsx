@@ -1,5 +1,5 @@
-import logo from '../logo.svg';
-import '../Home.css';
+import logo from '../logo.svg'
+import '../Home.css'
 
 const Home = () => {
   return (
@@ -20,6 +20,6 @@ const Home = () => {
       </header>
     </div>
   )
-};
+}
 
-export default Home;
+export default Home
