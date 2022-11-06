@@ -2,6 +2,33 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { URL } from '../utils/constants'
 import { Loader } from '../utils/style/Atoms'
+import styled from 'styled-components'
+import colors from '../utils/style/colors'
+
+const SurveyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const QuestionTitle = styled.h2`
+  text-decoration: underline;
+  text-decoration-color: ${colors.primary};
+`
+
+const QuestionContent = styled.span`
+  margin: 30px;
+`
+
+const LinkWrapper = styled.div`
+  padding-top: 30px;
+  & a {
+    color: black;
+  }
+  & a:first-of-type {
+    margin-right: 20px;
+  }
+`
 
 const Survey = () => {
   const { questionNumber } = useParams()
@@ -23,28 +50,30 @@ const Survey = () => {
   }, [])
 
   return (
-    <div>
-      <h1>Questionnaire 🧮</h1>
-      <h2>Question {currentNumber}</h2>
+    <SurveyContainer>
+      <QuestionTitle>Questionnaire 🧮</QuestionTitle>
+      <QuestionContent>Question {currentNumber}</QuestionContent>
       {isDataLoading ? <Loader /> : <p>{surveyData[currentNumber]}</p>}
-      <Link
-        to={`/survey/${currentNumber - 1}`}
-        style={{ pointerEvents: currentNumber <= 1 ? 'none' : '' }}
-        onClick={() => setCurrentNumber(currentNumber - 1)}
-      >
-        Précédent
-      </Link>
-      {currentNumber < surveyLength ? (
+      <LinkWrapper>
         <Link
-          to={`/survey/${currentNumber + 1}`}
-          onClick={() => setCurrentNumber(currentNumber + 1)}
+          to={`/survey/${currentNumber - 1}`}
+          style={{ pointerEvents: currentNumber <= 1 ? 'none' : '' }}
+          onClick={() => setCurrentNumber(currentNumber - 1)}
         >
-          Suivant
+          Précédent
         </Link>
-      ) : (
-        <Link to="/results">Résultats</Link>
-      )}
-    </div>
+        {currentNumber < surveyLength ? (
+          <Link
+            to={`/survey/${currentNumber + 1}`}
+            onClick={() => setCurrentNumber(currentNumber + 1)}
+          >
+            Suivant
+          </Link>
+        ) : (
+          <Link to="/results">Résultats</Link>
+        )}
+      </LinkWrapper>
+    </SurveyContainer>
   )
 }
 
