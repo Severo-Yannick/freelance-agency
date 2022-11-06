@@ -35,19 +35,42 @@ const Survey = () => {
   const [currentNumber, setCurrentNumber] = useState(parseInt(questionNumber))
   const [isDataLoading, setDataLoading] = useState(false)
   const [surveyData, setSurveyData] = useState({})
+  const [errorFetch, setErrorFetch] = useState(null)
   const surveyLength = Object.keys(surveyData).length
 
+  // Old method for calling API with then/catch
+  // useEffect(() => {
+  //   setDataLoading(true)
+  //   fetch(`${URL}survey`)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setSurveyData(data.surveyData)
+  //       setDataLoading(false)
+  //     })
+  //     .catch((error) => {
+  //       // eslint-disable-next-line no-console
+  //       console.error('Error fetching survey data', error)
+  //       setErrorFetch(true)
+  //     })
+  // }, [])
+
   useEffect(() => {
-    setDataLoading(true)
-    fetch(`${URL}survey`)
-      .then((response) => response.json())
-      .then((data) => {
-        setSurveyData(data.surveyData)
+    (async () => {
+      try {
+        setDataLoading(true)
+        const reponse = await fetch(`${URL}survey`)
+        const { surveyData } = await reponse.json()
+        setSurveyData(surveyData)
         setDataLoading(false)
-      })
-      // eslint-disable-next-line no-console
-      .catch((error) => console.error('Error fetching survey data', error))
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching survey data', error)
+        setErrorFetch(true)
+      }
+    })()
   }, [])
+
+  if (errorFetch) return <span>Oups un problème est survenu</span>
 
   return (
     <SurveyContainer>
