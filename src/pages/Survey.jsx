@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -6,32 +6,31 @@ import colors from '../utils/style/colors'
 import { Loader } from '../utils/style/Atoms'
 import { SurveyContext } from '../utils/context'
 import { URL } from '../utils/constants'
+import { useFetch, useTheme } from '../utils/hooks'
 
 const SurveyContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
 `
-
 const QuestionTitle = styled.h2`
   text-decoration: underline;
   text-decoration-color: ${colors.primary};
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
 `
-
 const QuestionContent = styled.span`
   margin: 30px;
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
 `
-
 const LinkWrapper = styled.div`
   padding-top: 30px;
   & a {
-    color: black;
+    color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
   }
   & a:first-of-type {
     margin-right: 20px;
   }
 `
-
 const ReplyBox = styled.button`
   border: none;
   height: 100px;
@@ -39,7 +38,9 @@ const ReplyBox = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${colors.backgroundLight};
+  background-color: ${({ theme }) =>
+    theme === 'light' ? colors.backgroundLight : colors.backgroundDark};
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
   border-radius: 30px;
   cursor: pointer;
   box-shadow: ${(props) =>
@@ -51,43 +52,24 @@ const ReplyBox = styled.button`
     margin-left: 15px;
   }
 `
-
 const ReplyWrapper = styled.div`
   display: flex;
   flex-direction: row;
 `
 
 function Survey() {
+  const { theme } = useTheme()
   const { questionNumber } = useParams()
   const questionNumberInt = parseInt(questionNumber)
   const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
   const nextQuestionNumber = questionNumberInt + 1
-  const [surveyData, setSurveyData] = useState({})
-  const [isDataLoading, setDataLoading] = useState(false)
   const { answers, saveAnswers } = useContext(SurveyContext)
-  const [error, setError] = useState(false)
+  const { data, isLoading, error } = useFetch(`${URL}survey`)
+  const { surveyData } = data
 
   function saveReply(answer) {
     saveAnswers({ [questionNumber]: answer })
   }
-
-  useEffect(() => {
-    async function fetchSurvey() {
-      setDataLoading(true)
-      try {
-        const response = await fetch(`${URL}survey`)
-        const { surveyData } = await response.json()
-        setSurveyData(surveyData)
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log('Error fetching data survey', err)
-        setError(true)
-      } finally {
-        setDataLoading(false)
-      }
-    }
-    fetchSurvey()
-  }, [])
 
   if (error) {
     return <span>Oups il y a eu un problème</span>
@@ -95,29 +77,33 @@ function Survey() {
 
   return (
     <SurveyContainer>
-      <QuestionTitle>Question {questionNumber}</QuestionTitle>
-      {isDataLoading ? (
+      <QuestionTitle theme={theme}>Question {questionNumber}</QuestionTitle>
+      {isLoading ? (
         <Loader />
       ) : (
-        <QuestionContent>{surveyData[questionNumber]}</QuestionContent>
+        <QuestionContent theme={theme}>
+          {surveyData && surveyData[questionNumber]}
+        </QuestionContent>
       )}
       <ReplyWrapper>
         <ReplyBox
           onClick={() => saveReply(true)}
           isSelected={answers[questionNumber] === true}
+          theme={theme}
         >
           Oui
         </ReplyBox>
         <ReplyBox
           onClick={() => saveReply(false)}
           isSelected={answers[questionNumber] === false}
+          theme={theme}
         >
           Non
         </ReplyBox>
       </ReplyWrapper>
-      <LinkWrapper>
+      <LinkWrapper theme={theme}>
         <Link to={`/survey/${prevQuestionNumber}`}>Précédent</Link>
-        {surveyData[questionNumberInt + 1] ? (
+        {surveyData && surveyData[questionNumberInt + 1] ? (
           <Link to={`/survey/${nextQuestionNumber}`}>Suivant</Link>
         ) : (
           <Link to="/results">Résultats</Link>
