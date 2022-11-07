@@ -6,33 +6,31 @@ import colors from '../utils/style/colors'
 import { Loader } from '../utils/style/Atoms'
 import { SurveyContext } from '../utils/context'
 import { URL } from '../utils/constants'
-import { useFetch } from '../utils/hooks'
+import { useFetch, useTheme } from '../utils/hooks'
 
 const SurveyContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
 `
-
 const QuestionTitle = styled.h2`
   text-decoration: underline;
   text-decoration-color: ${colors.primary};
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
 `
-
 const QuestionContent = styled.span`
   margin: 30px;
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
 `
-
 const LinkWrapper = styled.div`
   padding-top: 30px;
   & a {
-    color: black;
+    color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
   }
   & a:first-of-type {
     margin-right: 20px;
   }
 `
-
 const ReplyBox = styled.button`
   border: none;
   height: 100px;
@@ -40,7 +38,9 @@ const ReplyBox = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${colors.backgroundLight};
+  background-color: ${({ theme }) =>
+    theme === 'light' ? colors.backgroundLight : colors.backgroundDark};
+  color: ${({ theme }) => (theme === 'light' ? colors.black : colors.white)};
   border-radius: 30px;
   cursor: pointer;
   box-shadow: ${(props) =>
@@ -52,13 +52,13 @@ const ReplyBox = styled.button`
     margin-left: 15px;
   }
 `
-
 const ReplyWrapper = styled.div`
   display: flex;
   flex-direction: row;
 `
 
 function Survey() {
+  const { theme } = useTheme()
   const { questionNumber } = useParams()
   const questionNumberInt = parseInt(questionNumber)
   const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
@@ -77,27 +77,31 @@ function Survey() {
 
   return (
     <SurveyContainer>
-      <QuestionTitle>Question {questionNumber}</QuestionTitle>
+      <QuestionTitle theme={theme}>Question {questionNumber}</QuestionTitle>
       {isLoading ? (
         <Loader />
       ) : (
-        <QuestionContent>{surveyData && surveyData[questionNumber]}</QuestionContent>
+        <QuestionContent theme={theme}>
+          {surveyData && surveyData[questionNumber]}
+        </QuestionContent>
       )}
       <ReplyWrapper>
         <ReplyBox
           onClick={() => saveReply(true)}
           isSelected={answers[questionNumber] === true}
+          theme={theme}
         >
           Oui
         </ReplyBox>
         <ReplyBox
           onClick={() => saveReply(false)}
           isSelected={answers[questionNumber] === false}
+          theme={theme}
         >
           Non
         </ReplyBox>
       </ReplyWrapper>
-      <LinkWrapper>
+      <LinkWrapper theme={theme}>
         <Link to={`/survey/${prevQuestionNumber}`}>Précédent</Link>
         {surveyData && surveyData[questionNumberInt + 1] ? (
           <Link to={`/survey/${nextQuestionNumber}`}>Suivant</Link>

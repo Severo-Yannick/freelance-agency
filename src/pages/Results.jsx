@@ -2,9 +2,8 @@ import { useContext } from 'react'
 import { SurveyContext } from '../utils/context'
 import styled from 'styled-components'
 import colors from '../utils/style/colors'
-import { useFetch } from '../utils/hooks'
+import { useFetch, useTheme } from '../utils/hooks'
 import { StyledLink, Loader } from '../utils/style/Atoms'
-import { ThemeContext } from '../utils/context'
 import { URL } from '../utils/constants'
 
 const ResultsContainer = styled.div`
@@ -16,7 +15,6 @@ const ResultsContainer = styled.div`
   background-color: ${({ theme }) =>
     theme === 'light' ? colors.backgroundLight : colors.backgroundDark};
 `
-
 const ResultsTitle = styled.h2`
   color: ${({ theme }) => (theme === 'light' ? colors.dark : colors.light)};
   font-weight: bold;
@@ -27,29 +25,25 @@ const ResultsTitle = styled.h2`
     padding-left: 10px;
   }
 `
-
 const DescriptionWrapper = styled.div`
   padding: 60px;
 `
-
 const JobTitle = styled.span`
   color: ${({ theme }) =>
     theme === 'light' ? colors.primary : colors.backgroundLight};
   text-transform: capitalize;
 `
-
 const JobDescription = styled.div`
   font-size: 18px;
   & > p {
     color: ${({ theme }) =>
-      theme === 'light' ? colors.secondary : colors.light};
+      theme === 'light' ? colors.secondary : colors.white};
     margin-block-start: 5px;
   }
   & > span {
     font-size: 20px;
   }
 `
-
 const LoaderWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -66,13 +60,11 @@ function formatFetchParams(answers) {
 }
 
 function Results() {
-  const { theme } = useContext(ThemeContext)
+  const { theme } = useTheme()
   const { answers } = useContext(SurveyContext)
   const fetchParams = formatFetchParams(answers)
 
-  const { data, isLoading, error } = useFetch(
-    `${URL}results?${fetchParams}`
-  )
+  const { data, isLoading, error } = useFetch(`${URL}results?${fetchParams}`)
 
   if (error) {
     return <span>Il y a un problème</span>

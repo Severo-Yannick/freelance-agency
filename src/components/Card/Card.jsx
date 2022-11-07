@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
+import { useTheme } from '../../utils/hooks'
 
 const CardLabel = styled.span`
   color: ${colors.primary};
@@ -14,14 +15,12 @@ const CardImage = styled.img`
   align-self: center;
   border-radius: 50%;
 `
-
 const CardTitle = styled.span`
   color: black;
   font-size: 22px;
   font-weight: normal;
   align-self: center;
 `
-
 const CardWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -39,11 +38,13 @@ const CardWrapper = styled.div`
 `
 
 const Card = ({ label, title, picture }) => {
+  const { theme } = useTheme()
+
   return (
-    <CardWrapper>
-      <CardLabel>{label}</CardLabel>
+    <CardWrapper theme={theme}>
+      <CardLabel theme={theme}>{label}</CardLabel>
       <CardImage src={picture} alt="freelance" />
-      <CardTitle>{title}</CardTitle>
+      <CardTitle theme={theme}>{title}</CardTitle>
     </CardWrapper>
   )
 }
