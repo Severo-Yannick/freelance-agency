@@ -8,20 +8,27 @@ import Freelances from './pages/Freelances'
 import Results from './pages/Results'
 import Survey from './pages/Survey'
 import NotFound from './components/Error/NotFound'
+import Footer from './components/Footer/Footer'
 import reportWebVitals from './reportWebVitals'
+import { ThemeProvider } from './utils/context'
+import GlobalStyle from './utils/style/GlobalStyle'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/freelances" element={<Freelances />} />
-        <Route path="/results" element={<Results />} />
-        <Route path="/survey/:questionNumber" element={<Survey />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <ThemeProvider>
+        <GlobalStyle />
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/freelances" element={<Freelances />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/survey/:questionNumber" element={<Survey />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 )
