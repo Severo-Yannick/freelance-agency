@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { URL } from '../utils/constants'
-import { Loader } from '../utils/style/Atoms'
+import { useState, useEffect, useContext } from 'react'
+import { useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import colors from '../utils/style/colors'
+import { Loader } from '../utils/style/Atoms'
+import { SurveyContext } from '../utils/context'
+import { URL } from '../utils/constants'
 
 const SurveyContainer = styled.div`
   display: flex;
@@ -30,68 +32,93 @@ const LinkWrapper = styled.div`
   }
 `
 
-const Survey = () => {
-  const { questionNumber } = useParams()
-  const [currentNumber, setCurrentNumber] = useState(parseInt(questionNumber))
-  const [isDataLoading, setDataLoading] = useState(false)
-  const [surveyData, setSurveyData] = useState({})
-  const [errorFetch, setErrorFetch] = useState(null)
-  const surveyLength = Object.keys(surveyData).length
+const ReplyBox = styled.button`
+  border: none;
+  height: 100px;
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${colors.backgroundLight};
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: ${(props) =>
+    props.isSelected ? `0px 0px 0px 2px ${colors.primary} inset` : 'none'};
+  &:first-child {
+    margin-right: 15px;
+  }
+  &:last-of-type {
+    margin-left: 15px;
+  }
+`
 
-  // Old method for calling API with then/catch
-  // useEffect(() => {
-  //   setDataLoading(true)
-  //   fetch(`${URL}survey`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setSurveyData(data.surveyData)
-  //       setDataLoading(false)
-  //     })
-  //     .catch((error) => {
-  //       // eslint-disable-next-line no-console
-  //       console.error('Error fetching survey data', error)
-  //       setErrorFetch(true)
-  //     })
-  // }, [])
+const ReplyWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+`
+
+function Survey() {
+  const { questionNumber } = useParams()
+  const questionNumberInt = parseInt(questionNumber)
+  const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
+  const nextQuestionNumber = questionNumberInt + 1
+  const [surveyData, setSurveyData] = useState({})
+  const [isDataLoading, setDataLoading] = useState(false)
+  const { answers, saveAnswers } = useContext(SurveyContext)
+  const [error, setError] = useState(false)
+
+  function saveReply(answer) {
+    saveAnswers({ [questionNumber]: answer })
+  }
 
   useEffect(() => {
-    (async () => {
+    async function fetchSurvey() {
+      setDataLoading(true)
       try {
-        setDataLoading(true)
-        const reponse = await fetch(`${URL}survey`)
-        const { surveyData } = await reponse.json()
+        const response = await fetch(`${URL}survey`)
+        const { surveyData } = await response.json()
         setSurveyData(surveyData)
-        setDataLoading(false)
-      } catch (error) {
+      } catch (err) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching survey data', error)
-        setErrorFetch(true)
+        console.log('Error fetching data survey', err)
+        setError(true)
+      } finally {
+        setDataLoading(false)
       }
-    })()
+    }
+    fetchSurvey()
   }, [])
 
-  if (errorFetch) return <span>Oups un problème est survenu</span>
+  if (error) {
+    return <span>Oups il y a eu un problème</span>
+  }
 
   return (
     <SurveyContainer>
-      <QuestionTitle>Questionnaire 🧮</QuestionTitle>
-      <QuestionContent>Question {currentNumber}</QuestionContent>
-      {isDataLoading ? <Loader /> : <p>{surveyData[currentNumber]}</p>}
-      <LinkWrapper>
-        <Link
-          to={`/survey/${currentNumber - 1}`}
-          style={{ pointerEvents: currentNumber <= 1 ? 'none' : '' }}
-          onClick={() => setCurrentNumber(currentNumber - 1)}
+      <QuestionTitle>Question {questionNumber}</QuestionTitle>
+      {isDataLoading ? (
+        <Loader />
+      ) : (
+        <QuestionContent>{surveyData[questionNumber]}</QuestionContent>
+      )}
+      <ReplyWrapper>
+        <ReplyBox
+          onClick={() => saveReply(true)}
+          isSelected={answers[questionNumber] === true}
         >
-          Précédent
-        </Link>
-        {currentNumber < surveyLength ? (
-          <Link
-            to={`/survey/${currentNumber + 1}`}
-            onClick={() => setCurrentNumber(currentNumber + 1)}
-          >
-            Suivant
-          </Link>
+          Oui
+        </ReplyBox>
+        <ReplyBox
+          onClick={() => saveReply(false)}
+          isSelected={answers[questionNumber] === false}
+        >
+          Non
+        </ReplyBox>
+      </ReplyWrapper>
+      <LinkWrapper>
+        <Link to={`/survey/${prevQuestionNumber}`}>Précédent</Link>
+        {surveyData[questionNumberInt + 1] ? (
+          <Link to={`/survey/${nextQuestionNumber}`}>Suivant</Link>
         ) : (
           <Link to="/results">Résultats</Link>
         )}
