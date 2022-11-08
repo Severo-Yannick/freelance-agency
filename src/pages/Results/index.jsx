@@ -1,10 +1,10 @@
 import { useContext } from 'react'
-import { SurveyContext } from '../utils/context'
+import { SurveyContext } from '../../utils/context'
 import styled from 'styled-components'
-import colors from '../utils/style/colors'
-import { useFetch, useTheme } from '../utils/hooks'
-import { StyledLink, Loader } from '../utils/style/Atoms'
-import { URL } from '../utils/constants'
+import colors from '../../utils/style/colors'
+import { useFetch, useTheme } from '../../utils/hooks'
+import { StyledLink, Loader } from '../../utils/style/Atoms'
+import { URL } from '../../utils/constants'
 
 const ResultsContainer = styled.div`
   display: flex;
@@ -59,6 +59,13 @@ function formatFetchParams(answers) {
   }, '')
 }
 
+export function formatJobList(title, listLength, index) {
+  if (index === listLength - 1) {
+    return title
+  }
+  return `${title},`
+}
+
 function Results() {
   const { theme } = useTheme()
   const { answers } = useContext(SurveyContext)
@@ -86,8 +93,7 @@ function Results() {
               key={`result-title-${index}-${result.title}`}
               theme={theme}
             >
-              {result.title}
-              {index === resultsData.length - 1 ? '' : ','}
+              {formatJobList(result.title, resultsData.length, index)}
             </JobTitle>
           ))}
       </ResultsTitle>

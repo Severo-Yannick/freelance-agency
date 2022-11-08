@@ -5,7 +5,7 @@ import './index.css'
 import Home from './pages/Home'
 import Header from './components/Header/Header'
 import Freelances from './pages/Freelances'
-import Results from './pages/Results'
+import Results from './pages/Results/index'
 import Survey from './pages/Survey'
 import NotFound from './components/Error/NotFound'
 import Footer from './components/Footer/Footer'
@@ -18,18 +18,18 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-      <SurveyProvider>
-        <GlobalStyle />
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/freelances" element={<Freelances />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/survey/:questionNumber" element={<Survey />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-      </SurveyProvider>
+        <SurveyProvider>
+          <GlobalStyle />
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/freelances" element={<Freelances />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/survey/:questionNumber" element={<Survey />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </SurveyProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
