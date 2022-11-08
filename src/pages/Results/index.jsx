@@ -1,10 +1,10 @@
 import { useContext } from 'react'
-import { SurveyContext } from '../utils/context'
+import { SurveyContext } from '../../utils/context'
 import styled from 'styled-components'
-import colors from '../utils/style/colors'
-import { useFetch, useTheme } from '../utils/hooks'
-import { StyledLink, Loader } from '../utils/style/Atoms'
-import { URL } from '../utils/constants'
+import colors from '../../utils/style/colors'
+import { useFetch, useTheme } from '../../utils/hooks'
+import { StyledLink, Loader } from '../../utils/style/Atoms'
+import { URL } from '../../utils/constants'
 
 const ResultsContainer = styled.div`
   display: flex;
@@ -49,22 +49,28 @@ const LoaderWrapper = styled.div`
   justify-content: center;
 `
 
-function formatFetchParams(answers) {
+export function formatQueryParams(answers) {
   const answerNumbers = Object.keys(answers)
 
   return answerNumbers.reduce((previousParams, answerNumber, index) => {
-    const isFirstParam = index === 0
-    const separator = isFirstParam ? '' : '&'
+    const separator = index === 0 ? '' : '&'
     return `${previousParams}${separator}a${answerNumber}=${answers[answerNumber]}`
   }, '')
+}
+
+export function formatJobList(title, listLength, index) {
+  if (index === listLength - 1) {
+    return title
+  }
+  return `${title},`
 }
 
 function Results() {
   const { theme } = useTheme()
   const { answers } = useContext(SurveyContext)
-  const fetchParams = formatFetchParams(answers)
+  const queryParams = formatQueryParams(answers)
 
-  const { data, isLoading, error } = useFetch(`${URL}results?${fetchParams}`)
+  const { data, isLoading, error } = useFetch(`${URL}results?${queryParams}`)
 
   if (error) {
     return <span>Il y a un problème</span>
@@ -86,8 +92,7 @@ function Results() {
               key={`result-title-${index}-${result.title}`}
               theme={theme}
             >
-              {result.title}
-              {index === resultsData.length - 1 ? '' : ','}
+              {formatJobList(result.title, resultsData.length, index)}
             </JobTitle>
           ))}
       </ResultsTitle>
