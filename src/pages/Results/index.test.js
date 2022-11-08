@@ -1,4 +1,4 @@
-import { formatJobList } from './'
+import { formatJobList, formatQueryParams } from './'
 
 describe('The formatJobList function', () => {
   it('should add a comma to a word', () => {
@@ -9,5 +9,17 @@ describe('The formatJobList function', () => {
   it('should not add a comma to the last element of the list', () => {
     const expectedState = 'item3'
     expect(formatJobList('item3', 3, 2)).toEqual(expectedState)
+  })
+})
+
+describe('The formatQueryParams function', () => {
+  it('should use the right format for param', () => {
+    const expectedState = "a1=false"
+    expect(formatQueryParams({1: false})).toEqual(expectedState)
+  })
+
+  it('should concatenate params with an &', () => {
+    const expectedState = "a1=false&a2=false&a3=false&a5=false&a6=false"
+    expect(formatQueryParams({1: false, 2: false, 3: false, 5: false, 6: false})).toEqual(expectedState)
   })
 })

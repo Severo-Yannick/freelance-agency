@@ -49,12 +49,11 @@ const LoaderWrapper = styled.div`
   justify-content: center;
 `
 
-function formatFetchParams(answers) {
+export function formatQueryParams(answers) {
   const answerNumbers = Object.keys(answers)
 
   return answerNumbers.reduce((previousParams, answerNumber, index) => {
-    const isFirstParam = index === 0
-    const separator = isFirstParam ? '' : '&'
+    const separator = index === 0 ? '' : '&'
     return `${previousParams}${separator}a${answerNumber}=${answers[answerNumber]}`
   }, '')
 }
@@ -69,9 +68,9 @@ export function formatJobList(title, listLength, index) {
 function Results() {
   const { theme } = useTheme()
   const { answers } = useContext(SurveyContext)
-  const fetchParams = formatFetchParams(answers)
+  const queryParams = formatQueryParams(answers)
 
-  const { data, isLoading, error } = useFetch(`${URL}results?${fetchParams}`)
+  const { data, isLoading, error } = useFetch(`${URL}results?${queryParams}`)
 
   if (error) {
     return <span>Il y a un problème</span>
